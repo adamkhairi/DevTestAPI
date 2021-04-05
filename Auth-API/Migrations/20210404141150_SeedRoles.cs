@@ -5,6 +5,7 @@ namespace Auth_API.Migrations
 {
     public partial class SeedRoles : Migration
     {
+
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.InsertData(
@@ -20,9 +21,11 @@ namespace Auth_API.Migrations
             );
         }
 
+
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql("Delete From [AspNetRoles]");
         }
+
     }
 }
