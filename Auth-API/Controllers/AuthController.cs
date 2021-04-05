@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Net;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 using Auth_API.Models;
 using Auth_API.Services;
 using AutoMapper.Configuration;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Auth_API.Controllers
 {
@@ -76,6 +78,8 @@ namespace Auth_API.Controllers
 
         #region Get UserList and RoleList
 
+
+        [Authorize(Roles = "Admin")]
         [HttpGet("Roles")]
         public async Task<IActionResult> AddToRoleAsync()
         {
@@ -84,7 +88,7 @@ namespace Auth_API.Controllers
 
             if (roleList.Count < 0 || usersList.Count < 0) return BadRequest();
 
-            return Ok(new {Roles = roleList, Users = usersList});
+            return Ok(new { Roles = roleList, Users = usersList });
 
         }
 
@@ -95,6 +99,7 @@ namespace Auth_API.Controllers
         #region Add User To Role Method
 
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("Roles")]
         public async Task<IActionResult> AddToRoleAsync([FromBody] AddRoleModel model)
         {
