@@ -12,7 +12,11 @@ namespace Auth_API.Helpers
     {
         public AppUserProfile()
         {
-            this.CreateMap<ApplicationUser, RegisterModel>();
+            this.CreateMap<RegisterModel,ApplicationUser >();
+            this.CreateMap<ApplicationUser,RegisterModel >();
+            this.CreateMap<ApplicationUser,AuthModel>();
+            this.CreateMap<ApplicationUser,ApplicationUser>();
+            //  this.CreateMap<List<ApplicationUser>,List<RegisterModel>>();
 
         }
     }

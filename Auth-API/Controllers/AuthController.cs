@@ -16,7 +16,10 @@ namespace Auth_API.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
+
+
         private readonly IAuthService _authService;
+
 
         public AuthController(IAuthService authService)
         {
@@ -51,10 +54,12 @@ namespace Auth_API.Controllers
 
 
 
+
+
         #region Login Method (Get Token)
 
 
-        [HttpPost("login")]
+        [HttpPost("Login")]
         public async Task<IActionResult> LoginAsync([FromBody] TokenRequestModel model)
         {
             //Check the Model State(Annotaions)
@@ -93,6 +98,8 @@ namespace Auth_API.Controllers
         }
 
         #endregion
+
+
 
 
 

@@ -31,7 +31,9 @@ namespace Auth_API.Services
         }
 
 
-        #region  Registration 
+
+
+        #region  Registration
 
         public async Task<AuthModel> RegisterAsync(RegisterModel model)
         {
@@ -39,28 +41,29 @@ namespace Auth_API.Services
             if (await _userManager.FindByEmailAsync(model.Email) is not null)
                 return new AuthModel() { Message = "Email is already Registered" };
 
-            if (await _userManager.FindByNameAsync(model.Username) is not null)
+            if (await _userManager.FindByNameAsync(model.UserName) is not null)
                 return new AuthModel() { Message = "Username is already Registered" };
 
             //Create new User
-            var user = new ApplicationUser()
-            {
-                UserName = model.Username,
-                Email = model.Email,
-                FirstName = model.FirstName,
-                LastName = model.LastName
-            };
 
+            //var user = new ApplicationUser()
+            //{
+            //    UserName = model.UserName,
+            //    Email = model.Email,
+            //    FirstName = model.FirstName,
+            //    LastName = model.LastName
+            //};
 
-            ////TODO ==> Fix Mapper !!
+            var user = _mapper.Map<ApplicationUser>(model);
+
+            // !!/TODO ==> Fix Mapper !!
             //_mapper.Map<ApplicationUser>(model);
-
 
             //Create User and Hash Password While Creating
             var result = await _userManager.CreateAsync(user, model.Password);
 
 
-            //If Not succeed 
+            //If Not succeed
             if (!result.Succeeded)
             {
                 var errors = string.Empty;
@@ -84,17 +87,17 @@ namespace Auth_API.Services
             return new AuthModel
             {
                 Email = user.Email,
-                ExpiresOn = jwtSecurityToken.ValidTo,
-                IsAuthenticated = true,
+                UserName = user.UserName,
                 //TODO To Change ==>
                 Roles = new List<string> { "User" },
-                Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
-                Username = user.UserName
+                ExpiresOn = jwtSecurityToken.ValidTo,
+                IsAuthenticated = true,
+                Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken)
             };
         }
 
-
         #endregion
+
 
 
 
@@ -141,6 +144,7 @@ namespace Auth_API.Services
 
 
 
+
         #region Get Token From Login
 
         public async Task<AuthModel> GetTokenAsync(TokenRequestModel model)
@@ -160,11 +164,13 @@ namespace Auth_API.Services
 
 
             //TODO ==> Mapper
+            authModel = _mapper.Map<AuthModel>(user);
+
+            //authModel.Email = user.Email;
+            //authModel.UserName = user.UserName;
             authModel.IsAuthenticated = true;
             authModel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
             authModel.ExpiresOn = jwtSecurityToken.ValidTo;
-            authModel.Email = user.Email;
-            authModel.Username = user.UserName;
             authModel.Roles = rolesList.ToList();
 
             return authModel;
@@ -172,6 +178,7 @@ namespace Auth_API.Services
 
 
         #endregion
+
 
 
 
@@ -200,6 +207,7 @@ namespace Auth_API.Services
 
 
 
+
         #region GetRoles
 
         public async Task<List<object>> GetRolesList()
@@ -224,22 +232,23 @@ namespace Auth_API.Services
 
 
 
+
         #region GetUsers
 
         public async Task<List<object>> GetUsersList()
         {
             var usersList = new List<Object>();
 
-            var users =await _userManager.Users.ToListAsync();
-             users.ForEach(u=>
-            {
-                var user = new 
-                {
-                    userId = u.Id,
-                    Username = u.UserName,
-                };
-                usersList.Add(user);
-            });
+            var users = await _userManager.Users.ToListAsync();
+            users.ForEach(u =>
+           {
+               var user = new
+               {
+                   userId = u.Id,
+                   Username = u.UserName,
+               };
+               usersList.Add(user);
+           });
             return usersList;
         }
 
