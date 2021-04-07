@@ -80,51 +80,5 @@ namespace Auth_API.Controllers
         #endregion
 
 
-
-        #region Get UserList and RoleList
-
-
-        [Authorize(Roles = "Admin")]
-        [HttpGet("Roles")]
-        public async Task<IActionResult> AddToRoleAsync()
-        {
-            var roleList = await _authService.GetRolesList();
-            var usersList = await _authService.GetUsersList();
-
-            if (roleList.Count < 0 || usersList.Count < 0) return BadRequest();
-
-            return Ok(new { Roles = roleList, Users = usersList });
-
-        }
-
-        #endregion
-
-
-
-
-
-        #region Add User To Role Method
-
-
-        [Authorize(Roles = "Admin")]
-        [HttpPost("Roles")]
-        public async Task<IActionResult> AddToRoleAsync([FromBody] AddRoleModel model)
-        {
-            //Check the Model State(Annotaions)
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-
-            //AddRole and Get the Result
-            var result = await _authService.AddRoleAsync(model);
-
-            //In case Some error => BadRequest
-            if (string.IsNullOrEmpty(result)) return BadRequest(result);
-
-            //In case success return Ok with the result OR Object with some info (Needed!)
-            //return Ok(new {Token = result.Token , ExpiresOn= result.ExpiresOn});
-            return Ok(result);
-        }
-
-
-        #endregion
     }
 }

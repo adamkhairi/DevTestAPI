@@ -72,7 +72,8 @@ namespace Auth_API
             services.AddAutoMapper(c =>
             {
                 c.AllowNullCollections = true;
-                c.AllowNullDestinationValues = true;
+                // c.AllowNullDestinationValues = true;
+
             });
             services.AddAuthentication(options =>
             {
@@ -97,7 +98,14 @@ namespace Auth_API
                         };
                     });
 
+            // var mappingConfig = new MapperConfiguration(mc =>
+            // {
+            //     mc.AddProfile(new AppUserProfile());
+            // });
+            // IMapper mapper = mappingConfig.CreateMapper();
+            // services.AddSingleton(mapper);
             services.AddControllers();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Auth_API", Version = "v1" });
