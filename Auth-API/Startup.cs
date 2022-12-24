@@ -43,8 +43,8 @@ namespace Auth_API
                 op.AddPolicy(
                     "_AllowSpecificOrigins", builder => builder
                         .AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
                 );
             });
             services.Configure<Jwt>(Configuration.GetSection("Jwt"));
@@ -54,9 +54,9 @@ namespace Auth_API
                 .AddEntityFrameworkStores<AppDbContext>();
 
 
-
             services.AddDbContext<AppDbContext>(option =>
-                option.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
+                option
+                    .UseSqlServer(Configuration.GetConnectionString("SQLConnection"))
             );
 
 
@@ -73,30 +73,28 @@ namespace Auth_API
             {
                 c.AllowNullCollections = true;
                 // c.AllowNullDestinationValues = true;
-
             });
             services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-
-            })
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
                 .AddJwtBearer(o =>
 
+                {
+                    o.RequireHttpsMetadata = false;
+                    o.SaveToken = false;
+                    o.TokenValidationParameters = new TokenValidationParameters
                     {
-                        o.RequireHttpsMetadata = false;
-                        o.SaveToken = false;
-                        o.TokenValidationParameters = new TokenValidationParameters
-                        {
-                            ValidateIssuerSigningKey = true,
-                            ValidateIssuer = true,
-                            ValidateAudience = true,
-                            ValidateLifetime = true,
-                            ValidIssuer = Configuration["Jwt:Issuer"],
-                            ValidAudience = Configuration["Jwt:Audience"],
-                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
-                        };
-                    });
+                        ValidateIssuerSigningKey = true,
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidIssuer = Configuration["Jwt:Issuer"],
+                        ValidAudience = Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                    };
+                });
 
             // var mappingConfig = new MapperConfiguration(mc =>
             // {
@@ -130,10 +128,7 @@ namespace Auth_API
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }
 }
