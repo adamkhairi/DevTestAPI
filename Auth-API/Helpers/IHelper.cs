@@ -5,6 +5,7 @@ namespace Auth_API.Helpers
 {
     public interface IHelper
     {
-         Task<AuthModel> AddUser(RegisterModel model);
+      public string Check(string oldString, string newString);
+      public bool UploadImg(byte[] imgByte, string folder);
     }
 }

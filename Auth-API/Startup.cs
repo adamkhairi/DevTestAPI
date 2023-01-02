@@ -17,6 +17,8 @@ using Auth_API.Data;
 using Auth_API.Helpers;
 using Auth_API.Models;
 using Auth_API.Services;
+using Auth_API.Services.Auth;
+using Auth_API.Services.Users;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -54,26 +56,47 @@ namespace Auth_API
                 .AddEntityFrameworkStores<AppDbContext>();
 
 
+            
+            // !! Add DBContext ===>
+            // services.AddDbContext<AppDbContext>(option =>
+            //     option
+            //         .UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
+            // );
+            var sqlString = Configuration.GetConnectionString("SQLConnection");
             services.AddDbContext<AppDbContext>(option =>
-                option
-                    .UseSqlServer(Configuration.GetConnectionString("SQLConnection"))
+                option.UseMySql(sqlString!, ServerVersion.Parse("8.0.30"))
             );
 
-
+            //!! _ DependencyInjection _ ===>
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IHelper, Help>();
-
-            // services.AddAutoMapper(typeof(ApplicationUser));
-            // services.AddAutoMapper(typeof(AuthModel));
-            // services.AddAutoMapper(typeof(RegisterModel));
-            // services.AddAutoMapper(typeof(List<ApplicationUser>));
+            
+            // services.AddScoped<ICategoryServices, CategoryServices>();
+            // services.AddScoped<IProductService, ProductService>();
+            // services.AddScoped<ICartItemsService, CartItemsService>();
+            // services.AddScoped<IOrdersService, OrdersService>();
+            
+            // services.AddSingleton<IUriService>(provider =>
+            // {
+            //     var accessor = provider.GetRequiredService<IHttpContextAccessor>();
+            //     var request = accessor.HttpContext?.Request;
+            //     var absoluteUri = string.Concat(request?.Scheme, "://", request?.Host.ToUriComponent(), "/");
+            //     return new UriService(absoluteUri);
+            // });
+            
+            //AutoMapper
+            //services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            services.AddAutoMapper(typeof(ApplicationUser));
+            services.AddAutoMapper(typeof(AuthModel));
+            services.AddAutoMapper(typeof(RegisterModel));
+            services.AddAutoMapper(typeof(List<ApplicationUser>));
             services.AddAutoMapper(typeof(Startup));
             services.AddAutoMapper(c =>
             {
                 c.AllowNullCollections = true;
-                // c.AllowNullDestinationValues = true;
+                c.AllowNullDestinationValues = true;
             });
+            
             services.AddAuthentication(options =>
                 {
                     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -83,6 +106,7 @@ namespace Auth_API
 
                 {
                     o.RequireHttpsMetadata = false;
+                    //o.Authority = "https://localhost:5001";
                     o.SaveToken = false;
                     o.TokenValidationParameters = new TokenValidationParameters
                     {
@@ -92,16 +116,17 @@ namespace Auth_API
                         ValidateLifetime = true,
                         ValidIssuer = Configuration["Jwt:Issuer"],
                         ValidAudience = Configuration["Jwt:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]!))
                     };
                 });
+            services.AddHttpContextAccessor();
 
-            // var mappingConfig = new MapperConfiguration(mc =>
-            // {
-            //     mc.AddProfile(new AppUserProfile());
-            // });
-            // IMapper mapper = mappingConfig.CreateMapper();
-            // services.AddSingleton(mapper);
+            var mappingConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new AppUserProfile());
+            });
+            IMapper mapper = mappingConfig.CreateMapper();
+            services.AddSingleton(mapper);
             services.AddControllers();
 
             services.AddSwaggerGen(c =>
@@ -111,6 +136,11 @@ namespace Auth_API
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="env"></param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())

@@ -7,17 +7,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using Auth_API.Models;
 using Auth_API.Services;
+using Auth_API.Services.Auth;
 using AutoMapper.Configuration;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Auth_API.Controllers
 {
+    /// <inheritdoc />
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : ControllerBase
+     public class AuthController : ControllerBase
     {
-
-
         private readonly IAuthService _authService;
 
 
@@ -27,12 +27,16 @@ namespace Auth_API.Controllers
         }
 
 
-
         #region Registration Method (Create Token and register user)
-
-
-        [HttpPost("Register")]
-        public async Task<IActionResult> RegisterAsync([FromBody] RegisterModel model)
+        /// <summary>
+        /// Add New User and Return Token
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(AuthModel) ,StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(AuthModel) ,StatusCodes.Status400BadRequest)]
+        [HttpPost("[action]")]
+        public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
             //Check the Model State(Annotaions)
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -46,21 +50,21 @@ namespace Auth_API.Controllers
             //In case success return Ok with the result OR Object with some info (Needed!)
             //return Ok(new {Token = result.Token , ExpiresOn= result.ExpiresOn});
             return Ok(result);
-
         }
-
 
         #endregion
 
 
-
-
-
         #region Login Method (Get Token)
-
-
-        [HttpPost("Login")]
-        public async Task<IActionResult> LoginAsync([FromBody] TokenRequestModel model)
+        /// <summary>
+        /// Return Login Token
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns type="AuthModel"></returns>
+        [ProducesResponseType(typeof(AuthModel) ,StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(AuthModel) ,StatusCodes.Status400BadRequest)]
+        [HttpPost("[action]")]
+        public async Task<IActionResult> Login([FromBody] TokenRequestModel model)
         {
             //Check the Model State(Annotaions)
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -76,9 +80,6 @@ namespace Auth_API.Controllers
             return Ok(result);
         }
 
-
         #endregion
-
-
     }
 }

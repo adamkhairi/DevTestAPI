@@ -12,12 +12,12 @@ namespace Auth_API.Helpers
     {
         public AppUserProfile()
         {
-            this.CreateMap<RegisterModel,ApplicationUser >();
-            this.CreateMap<ApplicationUser,RegisterModel >();
-            this.CreateMap<ApplicationUser,AuthModel>();
-            this.CreateMap<ApplicationUser,ApplicationUser>();
-            this.CreateMap<EditUserModel,RegisterModel>();
-            this.CreateMap<EditUserModel,ApplicationUser>()
+            CreateMap<RegisterModel,ApplicationUser >();
+            CreateMap<ApplicationUser,RegisterModel >();
+            CreateMap<ApplicationUser,AuthModel>();
+            CreateMap<ApplicationUser,ApplicationUser>();
+            CreateMap<EditUserModel,RegisterModel>();
+            CreateMap<EditUserModel,ApplicationUser>()
             .ForMember(dest => dest.Email ,opt=> opt.PreCondition(src => !string.IsNullOrEmpty(src.Email) ))
             .ForMember(dest => dest.FirstName,opt => opt.PreCondition(src => string.IsNullOrEmpty(src.FirstName)))
             .ForMember(dest => dest.LastName,opt=> opt.PreCondition(src => !string.IsNullOrEmpty(src.LastName) ))
